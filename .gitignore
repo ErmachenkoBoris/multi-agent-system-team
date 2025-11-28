@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .env
+.secret.env
 *.log
 logs/
 .DS_Store

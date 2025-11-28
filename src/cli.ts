@@ -4,9 +4,12 @@ import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+import path from 'path';
 import { ProjectManager } from './core/ProjectManager.js';
 import { ProjectRequirements } from './types/index.js';
 
+// Load environment variables from .secret.env first (for API key), then .env for other settings
+dotenv.config({ path: path.resolve(process.cwd(), '.secret.env') });
 dotenv.config();
 
 const program = new Command();

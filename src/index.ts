@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
+// Load environment variables from .secret.env first (for API key), then .env for other settings
+dotenv.config({ path: path.resolve(process.cwd(), '.secret.env') });
 dotenv.config();
 
 export { ProjectManager } from './core/ProjectManager.js';
