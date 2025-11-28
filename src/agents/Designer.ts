@@ -3,7 +3,7 @@ import { LLMService } from '../services/llm.service.js';
 import { ProductSpecification, DesignSpecification } from '../types/index.js';
 
 export class DesignerAgent extends BaseAgent {
-  constructor(llmService: LLMService) {
+  constructor(llmService: LLMService, model?: string) {
     super(
       {
         name: 'UI/UX Designer',
@@ -42,6 +42,7 @@ export class DesignerAgent extends BaseAgent {
   ],
   "wireframes": "детальное описание основных экранов и их структуры"
 }`,
+        model,
       },
       llmService
     );

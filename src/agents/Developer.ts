@@ -16,7 +16,7 @@ interface DevelopmentInput {
 }
 
 export class DeveloperAgent extends BaseAgent {
-  constructor(llmService: LLMService) {
+  constructor(llmService: LLMService, model?: string) {
     super(
       {
         name: 'Fullstack Developer',
@@ -61,6 +61,7 @@ export class DeveloperAgent extends BaseAgent {
   "documentation": "README.md содержимое с описанием проекта",
   "setupInstructions": "детальные инструкции по установке и запуску"
 }`,
+        model,
       },
       llmService
     );

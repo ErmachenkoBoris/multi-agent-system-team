@@ -21,13 +21,13 @@ export class LLMService {
   private apiUrl: string;
   private defaultModel: string;
 
-  constructor() {
-    this.apiKey = process.env.OPENROUTER_API_KEY || '';
+  constructor(apiKey?: string, model?: string) {
+    this.apiKey = apiKey || process.env.OPENROUTER_API_KEY || '';
     this.apiUrl = process.env.OPENROUTER_API_URL || 'https://openrouter.ai/api/v1/chat/completions';
-    this.defaultModel = process.env.DEFAULT_MODEL || 'openai/gpt-4-turbo';
+    this.defaultModel = model || process.env.DEFAULT_MODEL || 'openai/gpt-4-turbo';
 
     if (!this.apiKey) {
-      throw new Error('OPENROUTER_API_KEY не установлен в .env файле');
+      throw new Error('API ключ не установлен. Установите OPENROUTER_API_KEY или передайте ключ в конструктор');
     }
   }
 

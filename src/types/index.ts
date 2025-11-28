@@ -3,7 +3,6 @@ export type AgentRole =
   | 'designer'
   | 'developer'
   | 'reviewer'
-  | 'tester'
   | 'manager';
 
 export interface Message {
@@ -100,12 +99,11 @@ export interface AgentConfig {
 }
 
 export interface WorkflowState {
-  currentPhase: 'requirements' | 'design' | 'development' | 'review' | 'testing' | 'complete';
+  currentPhase: 'requirements' | 'design' | 'development' | 'review' | 'complete';
   requirements?: ProductSpecification;
   design?: DesignSpecification;
   codebase?: ProjectOutput;
   reviewResult?: CodeReviewResult;
-  testResult?: TestResult;
   messages: AgentMessage[];
   revisionCount: number;
   maxRevisions: number;

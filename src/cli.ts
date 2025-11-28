@@ -99,8 +99,9 @@ program
     } catch (error: any) {
       console.error(chalk.red('\n❌ Ошибка:'), error.message);
       console.error(chalk.gray('\nПроверьте:'));
-      console.error(chalk.white('  - OPENROUTER_API_KEY установлен в .env'));
-      console.error(chalk.white('  - Соединение с интернетом\n'));
+      console.error(chalk.white('  - OPENROUTER_API_KEY установлен в .env (или индивидуальные ключи для агентов)'));
+      console.error(chalk.white('  - Соединение с интернетом'));
+      console.error(chalk.white('  - Запустите "npm run cli config" для проверки конфигурации\n'));
       process.exit(1);
     }
   });
@@ -111,20 +112,44 @@ program
   .action(() => {
     console.log(chalk.bold.cyan('\n🔧 Конфигурация:\n'));
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const defaultApiKey = process.env.OPENROUTER_API_KEY;
     const apiUrl = process.env.OPENROUTER_API_URL || 'https://openrouter.ai/api/v1/chat/completions';
-    const model = process.env.DEFAULT_MODEL || 'openai/gpt-4-turbo';
+    const defaultModel = process.env.DEFAULT_MODEL || 'openai/gpt-4-turbo';
     const outputDir = process.env.OUTPUT_DIR || './generated-projects';
 
-    console.log(chalk.white('API Key:'), apiKey ? chalk.green('✓ Установлен') : chalk.red('✗ Не установлен'));
-    console.log(chalk.white('API URL:'), chalk.cyan(apiUrl));
-    console.log(chalk.white('Model:'), chalk.cyan(model));
-    console.log(chalk.white('Output Dir:'), chalk.cyan(outputDir));
+    console.log(chalk.bold.white('\n📋 Общие настройки:'));
+    console.log(chalk.white('  API Key:'), defaultApiKey ? chalk.green('✓ Установлен') : chalk.red('✗ Не установлен'));
+    console.log(chalk.white('  API URL:'), chalk.cyan(apiUrl));
+    console.log(chalk.white('  Default Model:'), chalk.cyan(defaultModel));
+    console.log(chalk.white('  Output Dir:'), chalk.cyan(outputDir));
 
-    if (!apiKey) {
+    console.log(chalk.bold.white('\n🤖 Модели для агентов:'));
+    
+    const agents = [
+      { name: 'Product Manager', model: 'MODEL_PRODUCT_MANAGER' },
+      { name: 'Designer', model: 'MODEL_DESIGNER' },
+      { name: 'Developer', model: 'MODEL_DEVELOPER' },
+      { name: 'Code Reviewer', model: 'MODEL_REVIEWER' },
+    ];
+
+    agents.forEach((agent) => {
+      const agentModel = process.env[agent.model];
+      const usedModel = agentModel || defaultModel;
+      const modelSource = agentModel ? chalk.gray('(своя модель)') : chalk.gray('(общая модель)');
+
+      console.log(chalk.white(`\n  ${agent.name}:`));
+      console.log(chalk.white(`    Model: ${chalk.cyan(usedModel)} ${modelSource}`));
+    });
+
+    if (!defaultApiKey) {
       console.log(chalk.yellow('\n⚠️  OPENROUTER_API_KEY не установлен!'));
-      console.log(chalk.white('Создайте файл .env и добавьте:'));
-      console.log(chalk.gray('  OPENROUTER_API_KEY=your_api_key_here\n'));
+      console.log(chalk.white('\nДля настройки добавьте в .env:'));
+      console.log(chalk.gray('  OPENROUTER_API_KEY=sk-or-v1-ваш-ключ-здесь'));
+      console.log(chalk.gray('\n  # Индивидуальные модели для каждого агента (опционально)'));
+      console.log(chalk.gray('  MODEL_PRODUCT_MANAGER=openai/gpt-4-turbo'));
+      console.log(chalk.gray('  MODEL_DESIGNER=openai/gpt-4-turbo'));
+      console.log(chalk.gray('  MODEL_DEVELOPER=openai/gpt-4-turbo'));
+      console.log(chalk.gray('  MODEL_REVIEWER=openai/gpt-4-turbo\n'));
     } else {
       console.log(chalk.green('\n✅ Конфигурация в порядке!\n'));
     }

@@ -1,6 +1,8 @@
 import { LLMService } from '../services/llm.service.js';
 import { AgentConfig, AgentRole, Message, AgentMessage } from '../types/index.js';
 import chalk from 'chalk';
+import fs from 'fs/promises';
+import path from 'path';
 
 export abstract class BaseAgent {
   protected llmService: LLMService;
@@ -36,6 +38,11 @@ export abstract class BaseAgent {
       content: response.content,
     });
 
+    // Логируем в файл для всех агентов кроме Developer
+    if (this.config.role !== 'developer') {
+      await this.logToFile(response.content, prompt);
+    }
+
     return response.content;
   }
 
@@ -63,6 +70,11 @@ export abstract class BaseAgent {
       role: 'assistant',
       content: fullResponse,
     });
+
+    // Логируем в файл для всех агентов кроме Developer
+    if (this.config.role !== 'developer') {
+      await this.logToFile(fullResponse, prompt);
+    }
 
     return fullResponse;
   }
@@ -93,7 +105,6 @@ export abstract class BaseAgent {
       designer: chalk.magenta,
       developer: chalk.cyan,
       reviewer: chalk.yellow,
-      tester: chalk.green,
       manager: chalk.red,
     };
     return colors[this.config.role] || chalk.white;
@@ -119,6 +130,36 @@ export abstract class BaseAgent {
 
   public getName(): string {
     return this.config.name;
+  }
+
+  private async logToFile(response: string, prompt: string): Promise<void> {
+    try {
+      const logsDir = path.join(process.cwd(), 'logs');
+      await fs.mkdir(logsDir, { recursive: true });
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const roleName = this.config.role.replace(/_/g, '-');
+      const logFileName = `${roleName}-${timestamp}.log`;
+      const logFilePath = path.join(logsDir, logFileName);
+
+      const logContent = `=== ${this.config.name} - ${new Date().toLocaleString('ru-RU')} ===
+
+=== PROMPT ===
+${prompt}
+
+=== RESPONSE ===
+${response}
+
+${'='.repeat(80)}
+
+`;
+
+      await fs.appendFile(logFilePath, logContent, 'utf-8');
+      this.log(`📝 Ответ сохранен в файл: ${logFileName}`, 'info');
+    } catch (error) {
+      // Не прерываем выполнение, если логирование не удалось
+      console.error(`Ошибка при записи лога: ${error}`);
+    }
   }
 
   abstract execute(input: any): Promise<any>;

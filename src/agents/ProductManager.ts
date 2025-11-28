@@ -3,7 +3,7 @@ import { LLMService } from '../services/llm.service.js';
 import { ProjectRequirements, ProductSpecification } from '../types/index.js';
 
 export class ProductManagerAgent extends BaseAgent {
-  constructor(llmService: LLMService) {
+  constructor(llmService: LLMService, model?: string) {
     super(
       {
         name: 'Product Manager',
@@ -35,6 +35,7 @@ export class ProductManagerAgent extends BaseAgent {
   "technicalRequirements": ["требование 1", "требование 2", ...],
   "businessGoals": ["цель 1", "цель 2", ...]
 }`,
+        model,
       },
       llmService
     );

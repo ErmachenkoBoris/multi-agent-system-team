@@ -3,7 +3,7 @@ import { LLMService } from '../services/llm.service.js';
 import { ProjectOutput, CodeReviewResult } from '../types/index.js';
 
 export class CodeReviewerAgent extends BaseAgent {
-  constructor(llmService: LLMService) {
+  constructor(llmService: LLMService, model?: string) {
     super(
       {
         name: 'Code Reviewer',
@@ -49,6 +49,7 @@ export class CodeReviewerAgent extends BaseAgent {
 }
 
 Утверждай проект (approved: true) только если нет critical и major проблем.`,
+        model,
       },
       llmService
     );

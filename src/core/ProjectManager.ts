@@ -3,35 +3,44 @@ import { ProductManagerAgent } from '../agents/ProductManager.js';
 import { DesignerAgent } from '../agents/Designer.js';
 import { DeveloperAgent } from '../agents/Developer.js';
 import { CodeReviewerAgent } from '../agents/CodeReviewer.js';
-import { TesterAgent } from '../agents/Tester.js';
 import { CommunicationLogger } from '../utils/logger.js';
 import { FileSystemHelper } from '../utils/fileSystem.js';
 import { ProjectRequirements, WorkflowState } from '../types/index.js';
+import { loadAgentModelConfig, getAgentModel } from '../config/agentConfig.js';
 import chalk from 'chalk';
 import ora from 'ora';
 
 export class ProjectManager {
-  private llmService: LLMService;
   private logger: CommunicationLogger;
 
   private productManager: ProductManagerAgent;
   private designer: DesignerAgent;
   private developer: DeveloperAgent;
   private reviewer: CodeReviewerAgent;
-  private tester: TesterAgent;
 
   private state: WorkflowState;
   private maxRevisions: number = 1; // Максимум одна доработка после первого review
 
   constructor() {
-    this.llmService = new LLMService();
     this.logger = new CommunicationLogger();
 
-    this.productManager = new ProductManagerAgent(this.llmService);
-    this.designer = new DesignerAgent(this.llmService);
-    this.developer = new DeveloperAgent(this.llmService);
-    this.reviewer = new CodeReviewerAgent(this.llmService);
-    this.tester = new TesterAgent(this.llmService);
+    // Загружаем конфигурацию моделей для каждого агента
+    const modelConfig = loadAgentModelConfig();
+
+    // Создаем один LLMService с общим ключом
+    const llmService = new LLMService();
+
+    // Получаем модели для каждого агента
+    const pmModel = getAgentModel('product_manager', modelConfig);
+    const designerModel = getAgentModel('designer', modelConfig);
+    const developerModel = getAgentModel('developer', modelConfig);
+    const reviewerModel = getAgentModel('reviewer', modelConfig);
+
+    // Создаем агентов с их моделями
+    this.productManager = new ProductManagerAgent(llmService, pmModel);
+    this.designer = new DesignerAgent(llmService, designerModel);
+    this.developer = new DeveloperAgent(llmService, developerModel);
+    this.reviewer = new CodeReviewerAgent(llmService, reviewerModel);
 
     this.state = {
       currentPhase: 'requirements',
@@ -49,7 +58,6 @@ export class ProjectManager {
       await this.designPhase();
       await this.developmentPhase();
       await this.reviewPhase();
-      await this.testingPhase();
 
       const projectPath = await this.finalizeProject();
 
@@ -264,44 +272,6 @@ export class ProjectManager {
         spinner.fail('❌ Ошибка при code review');
         throw error;
       }
-    }
-  }
-
-  private async testingPhase(): Promise<void> {
-    const spinner = ora('🧪 Tester проводит тестирование...').start();
-
-    try {
-      this.state.currentPhase = 'testing';
-
-      const message = this.createMessage(
-        'tester',
-        'all',
-        'Начинаю тестирование проекта',
-        'request'
-      );
-      this.logger.log(message);
-
-      this.state.testResult = await this.tester.execute({
-        project: this.state.codebase!,
-        specification: this.state.requirements!,
-      });
-
-      if (this.state.testResult.passed) {
-        spinner.succeed('✅ Все тесты пройдены');
-      } else {
-        spinner.warn('⚠️  Некоторые тесты не прошли');
-      }
-
-      const response = this.createMessage(
-        'tester',
-        'manager',
-        `Тестирование завершено. Пройдено: ${this.state.testResult.testCases.filter(t => t.status === 'passed').length}/${this.state.testResult.testCases.length}`,
-        'response'
-      );
-      this.logger.log(response);
-    } catch (error) {
-      spinner.fail('❌ Ошибка при тестировании');
-      throw error;
     }
   }
 

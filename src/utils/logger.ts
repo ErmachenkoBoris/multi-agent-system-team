@@ -31,7 +31,6 @@ export class CommunicationLogger {
       designer: chalk.magenta,
       developer: chalk.cyan,
       reviewer: chalk.yellow,
-      tester: chalk.green,
       manager: chalk.red,
     };
     return colors[role] || chalk.white;
@@ -43,7 +42,6 @@ export class CommunicationLogger {
       designer: 'Designer',
       developer: 'Developer',
       reviewer: 'Code Reviewer',
-      tester: 'QA Tester',
       manager: 'Project Manager',
     };
     return names[role] || role;
