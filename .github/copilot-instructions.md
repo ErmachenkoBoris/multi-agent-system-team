@@ -21,7 +21,7 @@ Focus: be immediately productive — run the system, understand the orchestratio
 - `src/types/index.ts` — canonical shapes (ProjectRequirements, ProjectOutput, WorkflowState, CodeReviewResult). Use these types when adding/validating data flows.
 
 ## Project-specific conventions and gotchas
-- Tech-stack defaults are declared in two places: the CLI `ProjectRequirements.techStack` uses PostgreSQL, but `ProjectManager.developmentPhase` uses SQLite in some calls. Pay attention to which techStack value is passed through — prefer values coming from `requirements` when modifying behavior.
+- Tech-stack defaults: All projects now use SQLite for local development. The CLI `ProjectRequirements.techStack` and all agents consistently use SQLite as the database provider.
 - Agents return structured objects (not raw text). For example, Developer returns `ProjectOutput` whose `files` array is used directly by the filesystem helper — never assume file paths or content formats.
 - Revision policy: `ProjectManager.maxRevisions` controls review cycles. Changes to review flow must update both the count and user-facing messages.
 - Generated projects follow Next.js App Router conventions (see `generated-projects/*` examples). Keep created projects consistent with `README.md` descriptions (App Router, Prisma, Tailwind, etc.).
@@ -50,7 +50,7 @@ Focus: be immediately productive — run the system, understand the orchestratio
 - Programmatic run example (JS/TS):
   - import { ProjectManager } from './src/core/ProjectManager';
   - const pm = new ProjectManager();
-  - await pm.createProject({ idea: 'Todo app', techStack: { frontend:'Next.js', backend:'Next.js API Routes', database:'Postgres', orm:'Prisma' } });
+  - await pm.createProject({ idea: 'Todo app', techStack: { frontend:'Next.js', backend:'Next.js API Routes', database:'SQLite', orm:'Prisma' } });
 - Look at `generated-projects/contactbook---умная-книга-контактов` for a real generated project structure to match.
 
 ## Safety: what to avoid changing without explicit tests

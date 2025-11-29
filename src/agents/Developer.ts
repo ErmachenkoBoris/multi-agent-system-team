@@ -34,7 +34,7 @@ export class DeveloperAgent extends BaseAgent {
 Стек технологий:
 - Next.js (App Router) для frontend и API routes
 - TypeScript для типизации
-- Prisma ORM для работы с PostgreSQL
+- Prisma ORM для работы с SQLite
 - Tailwind CSS для стилей
 - React Server Components где возможно
 

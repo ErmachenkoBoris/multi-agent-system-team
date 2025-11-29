@@ -269,7 +269,7 @@ await manager.createProject({
   techStack: {
     frontend: 'Next.js',
     backend: 'Next.js API Routes',
-    database: 'PostgreSQL',
+    database: 'SQLite',
     orm: 'Prisma',
   },
 });

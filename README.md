@@ -33,7 +33,7 @@
 ### 3. 💻 Fullstack Developer
 Создает полноценный проект:
 - Next.js с App Router
-- Prisma + PostgreSQL
+- Prisma + SQLite
 - API Routes
 - React компоненты с Tailwind CSS
 
@@ -238,7 +238,7 @@ generated-projects/your-project/
 - Next.js 14 (App Router)
 - TypeScript
 - Prisma ORM
-- PostgreSQL
+- SQLite
 - Tailwind CSS
 - React Server Components
 
